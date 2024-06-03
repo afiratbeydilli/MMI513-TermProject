@@ -1,0 +1,10 @@
+# Ignore compiled files & compiler related directories
+*.pyc
+__pycache__/
+/.idea/
+
+# Ignore virtual environments
+/.venv/
+
+# Ignore log files
+*.log
