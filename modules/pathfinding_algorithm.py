@@ -1,7 +1,5 @@
 import numpy as np
 import matplotlib.pyplot as plt
-from shapely import Polygon, LineString
-from shapely.ops import triangulate
 import random
 def pathfinding_algorithm():
     print("pathfinding_algorithm")
