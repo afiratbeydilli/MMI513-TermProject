@@ -10,72 +10,6 @@ class pathUtils:
     def __init__(self):
         super().__init__()
 
-    def plotpoly(self, poly, flag=True):  ## Plots a polynomial
-        fig, ax = plt.subplots()
-        if flag:
-            ax.plot(poly[:, 1], poly[:, 0], 'o-r', linewidth=2)
-        else:
-            ax.plot(poly[:, 0], poly[:, 1], 'o-r', linewidth=2)
-            ax.plot([poly[-1, 0], poly[0, 0]], [poly[-1, 1], poly[0, 1]], 'o-r', linewidth=2)
-        return ax
-
-    # Triangulation is carried out in the convex hull and not within the polygon.
-    # We will select triangles within the polygon
-    def triangulate_within(self, polygon):
-        return [triangle for triangle in triangulate(polygon) if triangle.within(polygon)]
-
-    def getgraph(self, points):  # We are not doing any type-checking, which is not good!
-        polygon = Polygon(points)
-        trig = self.triangulate_within(polygon)
-        vertices = []
-        edges = []
-        for ply in trig:
-            neighs = ply.intersection(trig)
-            cp1 = ply.centroid
-            vertices.append(cp1)
-            ln = len(neighs)
-            for ind in range(ln):
-                neig = neighs[ind]
-                # Two triangles are neighbours only when their intersection is a LineString
-                if type(neig) == LineString:
-                    cp2 = trig[ind].centroid
-                    edges.append(LineString(
-                        [cp1, cp2]))  # We are adding all edges twice so we will have to eliminate them at the end
-        # Eliminate the duplicates now
-        edgeiter = edges.copy()
-        for edge in edgeiter:
-            if len(np.where(edge.equals(edges) == True)[0]) > 1:
-                edges.remove(edge)
-        return vertices, edges
-
-    def convertGraph(self, vertices, edges):  # Converts the vertices and edges returned from getGraph to be suitable for A* and Dijkstra algorithms
-        v = []
-        for vertice in vertices:
-            v.append((round(vertice.x, 2), round(vertice.y, 2)))
-        e = []
-        for edge in edges:
-            p1x = round(edge.coords[0][0], 2)
-            p1y = round(edge.coords[0][1], 2)
-            p2x = round(edge.coords[1][0], 2)
-            p2y = round(edge.coords[1][1], 2)
-            e.append(((p1x, p1y), (p2x, p2y)))
-        return v, e
-
-    def plotgraph(self, vertices, edges):  ## Plots the graph with edge weights in manhattan weight
-        x, y = [], []
-        for v in vertices:
-            x.append(v[0])
-            y.append(v[1])
-
-        plt.scatter(np.array(x), np.array(y))
-        plt.axis('equal')  # Equal aspect ratio
-        for e in edges:
-            plt.plot([e[0][0], e[1][0]], [e[0][1], e[1][1]], 'm')
-            x = (e[0][0] + e[1][0]) / 2
-            y = (e[0][1] + e[1][1]) / 2
-            plt.text(x, y, f'{round(abs(e[0][0] - e[1][0]) + abs(e[0][1] - e[1][1]), 2)}', verticalalignment='bottom',
-                     horizontalalignment='right', color='magenta')  # Text annotation
-            ## Weight of an edge in manhattan metric
 
     def plotPath(self,vertices, edges, start, end):  ## Plots the calculated path from the start and end vertices
         x, y = [], []
@@ -123,13 +57,15 @@ class pathUtils:
         travelledEdges = []
         for i in range(len(steps) - 1):
             travelledEdges.append(((steps[i]), (steps[i + 1])))
+        travelledEdges.reverse()
+        steps.reverse()
         return steps, travelledEdges
-    def plotSimpleRoom(self, aStarImplementor, simproom):
+    def plotSimpleRoom(self, aStarPathFinder, simproom):
         vertices, edges = self.getgraph(simproom)
         vertices, edges = self.convertGraph(vertices, edges)
 
         s, r = random.sample(vertices, 2)
-        res = aStarImplementor.aStar(vertices, edges, s, r)
+        res = aStarPathFinder.aStar(vertices, edges, s, r)
         steps, travelledEdges = self.calculatePathFromMapping(res, s, r)
         plt.figure()
         self.plotpoly(simproom, False)
@@ -155,12 +91,15 @@ class weightMatrix:
         s,v = index
         self.matrix[self.vertices.index(s)][self.vertices.index(v)] = value
 
-class aStarImplementor:
+class AStarPathFinder:
     def __init__(self):
         super().__init__()
+        self.utils = pathUtils()
+        self.path = []
+        self.steps = []
 
     def aStar(self,vertices, edges, s, r):
-        util = pathUtils()
+
         g = weightMatrix(vertices)  # function g(s->v)
         S = []  # OpenList S
         pi = {}  # Mapping pi: V -> V
@@ -169,14 +108,14 @@ class aStarImplementor:
             g[s, v] = np.inf
         g[s, s] = 0
         S.append(s)
-        g[s, r] = util.h(s, r)  ## Precalculate h(s,r)
+        g[s, r] = self.utils.h(s, r)  ## Precalculate h(s,r)
         selectedVertice = s  ##First start with the starting vertice
         while len(S) != 0:
             minWeight = np.inf
             for vPrime in S:  ##Find the vertice that minimizes g[s,vPrime]+ h(vPrime,r)
                 if (vPrime != s):
-                    if ((g[s, vPrime] + util.h(vPrime, r)) < minWeight):
-                        minWeight = g[s, vPrime] + util.h(vPrime, r)
+                    if ((g[s, vPrime] + self.utils.h(vPrime, r)) < minWeight):
+                        minWeight = g[s, vPrime] + self.utils.h(vPrime, r)
                         selectedVertice = vPrime
 
             if (selectedVertice == r and g[selectedVertice, r] < np.inf):  ## If the target vertice is reached, terminate
@@ -185,18 +124,58 @@ class aStarImplementor:
             if (selectedVertice in S):  ## S <- S \ {v}
                 S.pop(S.index(selectedVertice))
 
-            for u in util.getSuccessors(selectedVertice, edges, vertices):  ## For each successor of selectedVertice
+            for u in self.utils.getSuccessors(selectedVertice, edges, vertices):  ## For each successor of selectedVertice
                 if (pi[u] == None):  ## If it is NIL then open u
                     if (not (u in S)):  ## S <- S U {u}
                         S.append(u)
-                    g[s, u] = g[s, selectedVertice] + util.manhattanDistance(selectedVertice, u)  ## Update the weight
+                    g[s, u] = g[s, selectedVertice] + self.utils.manhattanDistance(selectedVertice, u)  ## Update the weight
                     pi[u] = selectedVertice  ##Update the mapping
-                    g[u, r] = util.h(u, r)  ##Precalculate h(u,r)
+                    g[u, r] = self.utils.h(u, r)  ##Precalculate h(u,r)
 
-                elif ((u in S) and ((g[s, selectedVertice] + util.manhattanDistance(selectedVertice, u)) < g[
+                elif ((u in S) and ((g[s, selectedVertice] + self.utils.manhattanDistance(selectedVertice, u)) < g[
                     s, u])):  ## g(s->v) + weight(v,u) < g(s->u) then open u
                     if (not (u in S)):  ## S <- S U {u}
                         S.append(u)
-                    g[s, u] = g[s, selectedVertice] + util.manhattanDistance(selectedVertice, u)  ## Update the weight
+                    g[s, u] = g[s, selectedVertice] + self.utils.manhattanDistance(selectedVertice, u)  ## Update the weight
                     pi[u] = selectedVertice  ##Update the mapping
-                    g[u, r] = util.h(u, r)  ##Precalculate h(u,r)
+                    g[u, r] = self.utils.h(u, r)  ##Precalculate h(u,r)
+
+    def findPath(self,vertices, map, start, end):
+        result = self.aStar(vertices, map, start, end)
+        self.steps, self.path = self.utils.calculatePathFromMapping(result, start, end)
+
+    def plotPath(self, vertices, map, walls, start, end, tumNoktalarCizilsinMi = False):
+        plt.rcParams['figure.figsize'] = [15, 15]
+        plt.figure()
+        if(tumNoktalarCizilsinMi):
+            allVerticeX, allVerticeY = [], []
+            for v in vertices:
+                allVerticeX.append(v[0])
+                allVerticeY.append(v[1])
+
+            plt.scatter(allVerticeX, allVerticeY, color = 'hotpink')
+            plt.axis('equal')  # Equal aspect ratio
+
+        pathVerticeX,pathVerticeY = [],[]
+        for v in self.steps:
+            pathVerticeX.append(v[0])
+            pathVerticeY.append(v[1])
+
+        plt.scatter(pathVerticeX, pathVerticeY, color = 'blue')
+        plt.axis('equal')  # Equal aspect ratio
+
+
+        for e in map:
+            plt.plot([e[0][0], e[1][0]], [e[0][1], e[1][1]], 'm')
+
+        for e in walls:
+            plt.plot([e[0][0], e[1][0]], [e[0][1], e[1][1]], 'k', linewidth=10)
+
+        for e in self.path:
+            plt.plot([e[0][0], e[1][0]], [e[0][1], e[1][1]], 'k')
+            plt.text(start[0], start[1], 'Start', verticalalignment='bottom', horizontalalignment='right', color='blue')
+            plt.text(end[0], end[1], 'End', verticalalignment='bottom', horizontalalignment='right', color='blue')
+
+        plt.axis('square')
+        plt.savefig("foundPath.png")
+        plt.close()  # Close the figure to release memory

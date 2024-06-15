@@ -3,7 +3,7 @@ import matplotlib.pyplot as plt
 def maze_generation():
     print("maze_generation algorithm")
 
-class undirectedGraph:
+class UndirectedGraph:
     def __init__(self):
         super().__init__()
     def getGraph(self, xnum=30, ynum=30):
@@ -51,9 +51,13 @@ class undirectedGraph:
         randind = np.random.randint(0, len(vertices))
         return vertices[randind]
 
-class primsMazeGenerator:
+class PrimsMazeGenerator:
     def __init__(self):
         super().__init__()
+        self.walls = []
+        self.vertices = []
+        self.map = []
+        self.graphGenerator = UndirectedGraph()
 
     def inSet(self, element, Set):  # Determine if the given element is in the given set
         for s in Set:  # Returns true if found
@@ -77,24 +81,24 @@ class primsMazeGenerator:
             count += 1
         return count
 
-    def getpPrimmsMaze(self, xnum=30, ynum=30):
+    def createPrimsMaze(self, xnum=30, ynum=30):
         assert (type(xnum) == int and type(ynum) == int)  # Assertions
         assert (xnum > 0 and ynum > 0)  # Both inputs must be positive integers
-        graphGenerator = undirectedGraph()
-        G = graphGenerator.getGraph(xnum, ynum)  # Construct the undirected connection graph with the given parameters
+
+        G = self.graphGenerator.getGraph(xnum, ynum)  # Construct the undirected connection graph with the given parameters
         W = set(G['E'].copy())  # Initialize walls
         V = set(G['V'].copy())  # Initialize edges
 
         L = set()  # Set of walls to check out, initally empty
         C = set()  # Visited Cells, initally empty
-        c = graphGenerator.randomnode(V)  # select c in V randomly
+        c = self.graphGenerator.randomnode(V)  # select c in V randomly
 
         for w in W:  # Initalize L with the neighbors of c
             if (self.inSet(c, w)):
                 L.add(w)
 
         while len(L):
-            l = graphGenerator.randomnode(L)  # Select l in L randomly
+            l = self.graphGenerator.randomnode(L)  # Select l in L randomly
             if self.intersectionSize(l, C) <= 1:  # |ends(l) n C| <=1
                 C.add(l[0])  # C <- C u ends(l)
                 C.add(l[1])
@@ -104,13 +108,11 @@ class primsMazeGenerator:
                         if self.inSet(w, L) != True:
                             L.add(w)  # Add the neighbouring walls
             L.remove(l)
-
         P = {'V': G['V'].copy(), 'E': list(W)}
-        return P
-    def plotgraph(self, G, vertexflag=False):
-        plt.rcParams['figure.figsize'] = [15, 15]
-        plt.figure()
-        for e in G['E']:
+        return P,G['E']
+    def getWalls(self,edges): ## Given input prims maze, return the coords of walls
+        walls = []
+        for e in edges:
             vec = np.array([e[1][0] - e[0][0], e[1][1] - e[0][1]])
             ort = np.array([-vec[1], vec[0]])
             olen = np.linalg.norm(ort)
@@ -118,11 +120,44 @@ class primsMazeGenerator:
             sum = np.array([(e[1][0] + e[0][0]) / 2, (e[1][1] + e[0][1]) / 2])
             startp = sum - ort / 2
             endp = sum + ort / 2
-            plt.plot((startp[0], endp[0]), (startp[1], endp[1]), 'k', linewidth=10)
-            if vertexflag:
-                for v in G['V']:
-                    plt.plot(float(v[0]), float(v[1]), 'ro')
+            walls.append(((startp[0], startp[1]), (endp[0], endp[1])))
+        return walls
+
+    def createMapFromWalls(self, meshEdges): ## Given a mesh like undirected connection graphs edges,
+        # remove the edges that intersect with the walls.
+        for w in self.walls:
+            x = w[0]
+            y = w[1]
+            ort = ((x[0] + y[0]) / 2, (x[1] + y[1]) / 2)
+            if (x[0] == y[0]):  ##vertical
+                meshEdges.remove(((ort[0] - 0.5, ort[1]), (ort[0] + 0.5, ort[1])))
+            else:
+                meshEdges.remove(((ort[0], ort[1] - 0.5), (ort[0], ort[1] + 0.5)))
+        return meshEdges
+    def initMaze(self,xnum = 30, ynum= 30):
+        P, meshEdges = self.createPrimsMaze(xnum,ynum)
+        self.vertices = P['V']
+        self.walls = self.getWalls(P['E'])
+        self.map = self.createMapFromWalls(meshEdges)
+
+    def plotMaze(self):
+        plt.rcParams['figure.figsize'] = [15, 15]
+        plt.figure()
+        verticeX ,verticeY = [], []
+        for v in self.vertices:
+            verticeX.append(v[0])
+            verticeY.append(v[1])
+
+        plt.scatter(verticeX,verticeY)
+        plt.axis('equal')  # Equal aspect ratio
+        for e in self.map:
+            plt.plot([e[0][0], e[1][0]], [e[0][1], e[1][1]], 'm')
+
+        for e in self.walls:
+            plt.plot([e[0][0], e[1][0]], [e[0][1], e[1][1]], 'k', linewidth=10)
 
         plt.axis('square')
         plt.savefig("primsMaze.png")
         plt.close()  # Close the figure to release memory
+
+
