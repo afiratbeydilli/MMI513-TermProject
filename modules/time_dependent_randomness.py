@@ -1,12 +1,13 @@
 import matplotlib.pyplot as plt
+import time
 def time_dependent_randomness():
     print("time_dependent_randomness algorithm")
 
 
 class lcgRandomGenerator:
-    def __init__(self, seed):
+    def __init__(self):
         super().__init__()
-        self.initVal = int(seed)
+        self.initVal = int(time.time())
 
     def modulosum(self, x, y, m):
         assert (x >= 0 and y >= 0)

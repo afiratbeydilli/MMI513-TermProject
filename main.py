@@ -4,8 +4,7 @@ from modules.maze_generation import PrimsMazeGenerator
 from modules.pathfinding_algorithm import pathUtils, AStarPathFinder
 import matplotlib.pyplot as plt
 import matplotlib.animation as animation
-from IPython.display import HTML
-import time
+
 
 def update():
     pass
@@ -16,7 +15,7 @@ def main():
     mazeGen.initMaze(dim, dim)
     mazeGen.plotMaze()
 
-    rng = lcgRandomGenerator(time.time())
+    rng = lcgRandomGenerator()
     [start,end] = rng.sample(mazeGen.vertices,2)
     print(start)
     print(end)
