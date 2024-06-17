@@ -4,9 +4,9 @@ def time_dependent_randomness():
 
 
 class lcgRandomGenerator:
-    def __init__(self):
+    def __init__(self, seed):
         super().__init__()
-        self.initVal = 123456789
+        self.initVal = int(seed)
 
     def modulosum(self, x, y, m):
         assert (x >= 0 and y >= 0)
@@ -66,3 +66,21 @@ class lcgRandomGenerator:
         n = self.lcg(startingval=self.initVal)
         self.initVal = n
         return int(n % (b - a) + a)
+
+    def sample(self, obj, amount):
+        assert(len(obj) > amount)
+        lenght = len(obj)
+        samples = []
+        randInts = []
+        n = self.randint(0,len(obj))
+
+        for i in range(amount):
+            while n in randInts:
+                n = self.randint(0,len(obj))
+            randInts.append(n)
+            samples.append(obj[n])
+
+        return samples
+
+
+

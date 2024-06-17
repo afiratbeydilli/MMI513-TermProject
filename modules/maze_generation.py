@@ -1,12 +1,13 @@
 import matplotlib.pyplot as plt
 from modules.time_dependent_randomness import lcgRandomGenerator
+import time
 def maze_generation():
     print("maze_generation algorithm")
 
 class UndirectedGraph:
     def __init__(self):
         super().__init__()
-        self.random = lcgRandomGenerator()
+        self.random = lcgRandomGenerator(time.time())
     def getGraph(self, xnum=30, ynum=30):
         G = {'V': [], 'E': []}  # We will use a dictionary for simplicity
         for xind in range(xnum):
