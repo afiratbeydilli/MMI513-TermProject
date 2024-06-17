@@ -1,11 +1,12 @@
-import numpy as np
 import matplotlib.pyplot as plt
+from modules.time_dependent_randomness import lcgRandomGenerator
 def maze_generation():
     print("maze_generation algorithm")
 
 class UndirectedGraph:
     def __init__(self):
         super().__init__()
+        self.random = lcgRandomGenerator()
     def getGraph(self, xnum=30, ynum=30):
         G = {'V': [], 'E': []}  # We will use a dictionary for simplicity
         for xind in range(xnum):
@@ -48,7 +49,7 @@ class UndirectedGraph:
 
     def randomnode(self, vertices):
         vertices = list(vertices)
-        randind = np.random.randint(0, len(vertices))
+        randind = self.random.randint(0, len(vertices))
         return vertices[randind]
 
 class PrimsMazeGenerator:
@@ -113,13 +114,13 @@ class PrimsMazeGenerator:
     def getWalls(self,edges): ## Given input prims maze, return the coords of walls
         walls = []
         for e in edges:
-            vec = np.array([e[1][0] - e[0][0], e[1][1] - e[0][1]])
-            ort = np.array([-vec[1], vec[0]])
-            olen = np.linalg.norm(ort)
-            ort = ort / olen
-            sum = np.array([(e[1][0] + e[0][0]) / 2, (e[1][1] + e[0][1]) / 2])
-            startp = sum - ort / 2
-            endp = sum + ort / 2
+            vec = [e[1][0] - e[0][0], e[1][1] - e[0][1]]
+            ort = [-vec[1], vec[0]]
+            olen = (ort[0]**2 + ort[1]**2)**0.5
+            ort = [(ort[0] / olen)/2, (ort[1]/olen)/2]
+            sum = [(e[1][0] + e[0][0]) / 2, (e[1][1] + e[0][1]) / 2]
+            startp = [sum[0] - ort[0],sum[1]-ort[1]]
+            endp = [sum[0] + ort[0],sum[1]+ort[1]]
             walls.append(((startp[0], startp[1]), (endp[0], endp[1])))
         return walls
 

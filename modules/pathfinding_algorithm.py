@@ -1,8 +1,8 @@
-import numpy as np
 import matplotlib.pyplot as plt
-import random
+inf = float('inf')
 def pathfinding_algorithm():
     print("pathfinding_algorithm")
+
 
 class pathUtils:
     def __init__(self):
@@ -14,7 +14,7 @@ class pathUtils:
         for v in vertices:
             x.append(v[0])
             y.append(v[1])
-            plt.scatter(np.array(x), np.array(y))
+            plt.scatter(x,y)
             plt.axis('equal')  # Equal aspect ratio
         for e in edges:
             plt.plot([e[0][0], e[1][0]], [e[0][1], e[1][1]], 'k')
@@ -58,20 +58,6 @@ class pathUtils:
         travelledEdges.reverse()
         steps.reverse()
         return steps, travelledEdges
-    def plotSimpleRoom(self, aStarPathFinder, simproom):
-        vertices, edges = self.getgraph(simproom)
-        vertices, edges = self.convertGraph(vertices, edges)
-
-        s, r = random.sample(vertices, 2)
-        res = aStarPathFinder.aStar(vertices, edges, s, r)
-        steps, travelledEdges = self.calculatePathFromMapping(res, s, r)
-        plt.figure()
-        self.plotpoly(simproom, False)
-        self.plotgraph(vertices, edges)
-        self.plotPath(steps, travelledEdges, s, r)
-        plt.title('A* Algorithm on Simple Room')
-        plt.savefig("aStar.png")
-        plt.close()
 
 
 ## A matrix class to store the distance between vertices this class implements g(s->r) function in A-Star and distance function in Dijkstra
@@ -81,7 +67,7 @@ class weightMatrix:
         self.vertices = vertices
         self.matrix = []
         for i in range(len(vertices)):
-            self.matrix.append([np.inf]*len(vertices))
+            self.matrix.append([inf]*len(vertices))
     def __getitem__(self, index):
         s,v = index
         return self.matrix[self.vertices.index(s)][self.vertices.index(v)]
@@ -103,20 +89,20 @@ class AStarPathFinder:
         pi = {}  # Mapping pi: V -> V
         for v in vertices:
             pi[v] = None
-            g[s, v] = np.inf
+            g[s, v] = inf
         g[s, s] = 0
         S.append(s)
         g[s, r] = self.utils.h(s, r)  ## Precalculate h(s,r)
         selectedVertice = s  ##First start with the starting vertice
         while len(S) != 0:
-            minWeight = np.inf
+            minWeight = inf
             for vPrime in S:  ##Find the vertice that minimizes g[s,vPrime]+ h(vPrime,r)
                 if (vPrime != s):
                     if ((g[s, vPrime] + self.utils.h(vPrime, r)) < minWeight):
                         minWeight = g[s, vPrime] + self.utils.h(vPrime, r)
                         selectedVertice = vPrime
 
-            if (selectedVertice == r and g[selectedVertice, r] < np.inf):  ## If the target vertice is reached, terminate
+            if (selectedVertice == r and g[selectedVertice, r] < inf):  ## If the target vertice is reached, terminate
                 return pi
 
             if (selectedVertice in S):  ## S <- S \ {v}
