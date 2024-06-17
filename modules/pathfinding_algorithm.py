@@ -128,38 +128,35 @@ class AStarPathFinder:
         result = self.aStar(vertices, map, start, end)
         self.steps, self.path = self.utils.calculatePathFromMapping(result, start, end)
 
-    def plotPath(self, vertices, map, walls, start, end, tumNoktalarCizilsinMi = False):
-        plt.rcParams['figure.figsize'] = [15, 15]
-        plt.figure()
+    def plotPath(self,fig,ax, vertices, map, walls, start, end, tumNoktalarCizilsinMi = False):
         if(tumNoktalarCizilsinMi):
             allVerticeX, allVerticeY = [], []
             for v in vertices:
                 allVerticeX.append(v[0])
                 allVerticeY.append(v[1])
 
-            plt.scatter(allVerticeX, allVerticeY, color = 'hotpink')
-            plt.axis('equal')  # Equal aspect ratio
+            ax.scatter(allVerticeX, allVerticeY, color = 'hotpink')
+            ax.axis('equal')  # Equal aspect ratio
+            for e in map:
+                ax.plot([e[0][0], e[1][0]], [e[0][1], e[1][1]], 'm')
 
         pathVerticeX,pathVerticeY = [],[]
         for v in self.steps:
             pathVerticeX.append(v[0])
             pathVerticeY.append(v[1])
 
-        plt.scatter(pathVerticeX, pathVerticeY, color = 'blue')
-        plt.axis('equal')  # Equal aspect ratio
+        ax.scatter(pathVerticeX, pathVerticeY, color = 'blue')
+        ax.axis('equal')  # Equal aspect ratio
 
 
-        for e in map:
-            plt.plot([e[0][0], e[1][0]], [e[0][1], e[1][1]], 'm')
+
 
         for e in walls:
-            plt.plot([e[0][0], e[1][0]], [e[0][1], e[1][1]], 'k', linewidth=10)
+            ax.plot([e[0][0], e[1][0]], [e[0][1], e[1][1]], 'k', linewidth=10)
 
         for e in self.path:
-            plt.plot([e[0][0], e[1][0]], [e[0][1], e[1][1]], 'k')
-            plt.text(start[0], start[1], 'Start', verticalalignment='bottom', horizontalalignment='right', color='blue')
-            plt.text(end[0], end[1], 'End', verticalalignment='bottom', horizontalalignment='right', color='blue')
-
-        plt.axis('square')
-        plt.savefig("foundPath.png")
-        plt.close()  # Close the figure to release memory
+            ax.plot([e[0][0], e[1][0]], [e[0][1], e[1][1]], 'k')
+            ax.text(start[0], start[1], 'Start', verticalalignment='bottom', horizontalalignment='right', color='blue')
+            ax.text(end[0], end[1], 'End', verticalalignment='bottom', horizontalalignment='right', color='blue')
+        ax.axis('square')
+        return fig,ax
