@@ -2,7 +2,7 @@
 
 ## Description
 
-In this project, `Prim's Maze` will be created in randomized fashion by using `Mersenne Twister 19937`
+In this project, `Prim's Maze` will be created in randomized fashion by using `Linear Congruential Generator (LCG)`
 random number generation method. Within the maze, `A*` algorithm will be implemented to navigate the
 user from the start to the end.
 

@@ -6,8 +6,8 @@ import matplotlib.animation as animation
 
 MAX_NUM_OF_FRAMES = 20
 class DynamicMaze:
-    def __init__(self):
-        self.dim = 6
+    def __init__(self, dim=6):
+        self.dim = dim
         self.mazeGen = PrimsMazeGenerator()
         self.rng = LCGRandomGenerator()
         self.pathFinder = AStarPathFinder()
