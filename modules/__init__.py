@@ -1,3 +1,4 @@
-from .maze_generation import maze_generation
-from .pathfinding_algorithm import pathfinding_algorithm
-from .time_dependent_randomness import time_dependent_randomness
+from .maze_generation import PrimsMazeGenerator
+from .time_dependent_randomness import LCGRandomGenerator
+from .pathfinding_algorithm import PathUtils, AStarPathFinder
+from .dynamic_maze import DynamicMaze
