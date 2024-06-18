@@ -71,6 +71,15 @@ cd MMI513-TermProject
 python main.py
 ```
 
+After above step, you should see two files in your working directory:
++ foundPath.png
++ path_animation.gif
+
+The first png file shows the initial state of the maze, and the path to reach the exit point.
+
+The second gif file is the animation of the project, showing whether the agent reached to the
+end point in the specified amount of frames.
+
 ## Contributing & License
 
 The project is prepared by two individuals for `MMI513 - Algorithms for Interactive Systems` course.
