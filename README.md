@@ -2,7 +2,7 @@
 
 ## Description
 
-In this project, `Prim's Maze` will be created in randomized fashion by using `Mersenne Twister 19937`
+In this project, `Prim's Maze` will be created in randomized fashion by using `Linear Congruential Generator (LCG)`
 random number generation method. Within the maze, `A*` algorithm will be implemented to navigate the
 user from the start to the end.
 
@@ -70,6 +70,15 @@ cd MMI513-TermProject
 ```sh
 python main.py
 ```
+
+After above step, you should see two files in your working directory:
++ foundPath.png
++ path_animation.gif
+
+The first png file shows the initial state of the maze, and the path to reach the exit point.
+
+The second gif file is the animation of the project, showing whether the agent reached to the
+end point in the specified amount of frames.
 
 ## Contributing & License
 

@@ -8,3 +8,7 @@ __pycache__/
 
 # Ignore log files
 *.log
+
+# Ignore animation files
+*.png
+*.gif

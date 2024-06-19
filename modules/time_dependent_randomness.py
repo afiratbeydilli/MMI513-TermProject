@@ -1,12 +1,8 @@
 import matplotlib.pyplot as plt
 import time
-def time_dependent_randomness():
-    print("time_dependent_randomness algorithm")
 
-
-class lcgRandomGenerator:
+class LCGRandomGenerator:
     def __init__(self):
-        super().__init__()
         self.initVal = int(time.time())
 
     def modulosum(self, x, y, m):
@@ -37,8 +33,6 @@ class lcgRandomGenerator:
         return r
 
     def lcgrandom(self, fun=None, modulus=2 ** 32 - 1, multiplier=367, increment=314, initval=1, num=10):
-        if fun is None:
-            fun = self.lcg2
         # Check conditions
         assert (fun == self.lcg)
         randlist = []  # Create an empty list to populate
@@ -69,15 +63,14 @@ class lcgRandomGenerator:
         return int(n % (b - a) + a)
 
     def sample(self, obj, amount):
-        assert(len(obj) > amount)
-        lenght = len(obj)
+        assert (len(obj) > amount)
         samples = []
         randInts = []
-        n = self.randint(0,len(obj))
+        n = self.randint(0, len(obj))
 
         for i in range(amount):
             while n in randInts:
-                n = self.randint(0,len(obj))
+                n = self.randint(0, len(obj))
             randInts.append(n)
             samples.append(obj[n])
 

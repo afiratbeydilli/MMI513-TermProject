@@ -1,33 +1,17 @@
-from modules import maze_generation, pathfinding_algorithm, time_dependent_randomness
-from modules.time_dependent_randomness import lcgRandomGenerator
-from modules.maze_generation import PrimsMazeGenerator
-from modules.pathfinding_algorithm import pathUtils, AStarPathFinder
-from modules.dynamic_maze import DynamicMaze
-import matplotlib.pyplot as plt
-import matplotlib.animation as animation
-import matplotlib.pyplot as plt
-import matplotlib.animation as animation
+from modules import DynamicMaze
+from modules.dynamic_maze import MAX_NUM_OF_FRAMES
 
-
-def update():
-    pass
+MAZE_DIMENSIONS = 6
 
 def main():
-    dynamicMaze = DynamicMaze()
-    dynamicMaze.initializeStructures()
-    #dynamicMaze.updateMaze(2)
-    dynamicMaze.animate()
-
-
-
-
-
-
+    dynamicMaze = DynamicMaze(MAZE_DIMENSIONS)
+    dynamicMaze.animate(MAX_NUM_OF_FRAMES)
+    if dynamicMaze.pathFinder.finished:
+        print("Maze is successfully solved")
 
 
 if __name__ == "__main__":
     main()
-    print("Main function")
 
 
 
