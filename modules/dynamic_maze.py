@@ -18,6 +18,14 @@ class DynamicMaze:
         self.fig = None
         self.ax = None
 
+    def showAndSaveInitialMeshStructure(self):
+        fig, ax = plt.subplots(figsize=(15, 15))
+        fig, ax = self.pathFinder.plotPath(fig, ax, self.mazeGen.vertices,
+                                           self.mazeGen.map, self.mazeGen.walls,
+                                           self.start, self.end,
+                                           True, True)
+        fig.savefig("foundPath.png")
+
     def initializeStructures(self):
         self.ax.clear()
         self.path.append(self.start)
@@ -28,19 +36,16 @@ class DynamicMaze:
                                                      self.mazeGen.map, self.mazeGen.walls,
                                                      self.start, self.end,
                                                      False, True)
-
-        self.fig.savefig("foundPath.png")
+        self.showAndSaveInitialMeshStructure()
 
     def updateMaze(self, frame):
 
         if frame == 0:
             self.initializeStructures()
-            self.ax.set_title(f'Frame {frame}')
 
         else:
             if not self.pathFinder.finished:
                 self.ax.clear()
-                self.ax.set_title(f'Frame {frame}')
                 self.currentPos = self.pathFinder.nextPointToMove()
                 self.path.append(self.currentPos)
                 self.mazeGen.initMaze(self.dim, self.dim)
@@ -53,6 +58,9 @@ class DynamicMaze:
             if not self.pathFinder.finished and frame == (MAX_NUM_OF_FRAMES - 1):
                 self.uncompletedMaze()
 
+        self.ax.set_title(f'Frame {frame}', fontsize=17)
+        self.ax.tick_params(axis='x', labelsize=17)
+        self.ax.tick_params(axis='y', labelsize=17)
         self.ax.set_xlim(-1, self.dim)
         self.ax.set_ylim(-1, self.dim)
         return self.fig, self.ax
@@ -60,9 +68,8 @@ class DynamicMaze:
     def uncompletedMaze(self):
         print(f"Unable to complete the maze in {MAX_NUM_OF_FRAMES} frames")
         self.ax.text(self.dim/2, self.dim/2, f'Unable to complete the maze in {MAX_NUM_OF_FRAMES} frames',
-                      horizontalalignment='center', verticalalignment='center',
-                      fontsize=40, color='red')
-        self.ax.set_axis_off()
+                     horizontalalignment='center', verticalalignment='center',
+                     fontsize=40, color='red')
 
     def animate(self, frames=MAX_NUM_OF_FRAMES):
         self.fig, self.ax = plt.subplots(figsize=(15, 15))

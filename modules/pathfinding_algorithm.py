@@ -175,21 +175,21 @@ class AStarPathFinder:
             ax.plot([e[0][0], e[1][0]], [e[0][1], e[1][1]], 'k', linewidth=10)
 
         if not self.finished:
-            ax.plot(start[0], start[1], 'ko')
-            ax.text(start[0], start[1], 'Agent', verticalalignment='bottom', horizontalalignment='right', color='blue')
+            ax.plot(start[0], start[1], 'ko', markersize=15)
+            ax.text(start[0], start[1], 'Agent', fontsize=25, verticalalignment='top', horizontalalignment='left', color='blue')
             for e in self.path:
-                ax.plot([e[0][0], e[1][0]], [e[0][1], e[1][1]], 'k')
+                ax.plot([e[0][0], e[1][0]], [e[0][1], e[1][1]], 'k--', linewidth=2)
         else:
-            ax.plot(self.end[0], self.end[1], 'ko')
-            ax.text(self.end[0], self.end[1], 'Agent', verticalalignment='bottom', horizontalalignment='right', color='blue')
+            ax.plot(self.end[0], self.end[1], 'ko', markersize=15)
+            ax.text(self.end[0], self.end[1], 'Agent', fontsize=25, verticalalignment='top', horizontalalignment='left', color='blue')
             ax.text(self.end[0], self.end[1], f'Maze is completed',
                     horizontalalignment='center', verticalalignment='top',
                     fontsize=40, color='green')
 
-        ax.plot(self.start[0], self.start[1], 'go')
-        ax.text(self.start[0], self.start[1], 'Start', verticalalignment='bottom', horizontalalignment='right', color='green')
-        ax.plot(self.end[0], self.end[1], 'ro')
-        ax.text(self.end[0], self.end[1], 'End', verticalalignment='bottom', horizontalalignment='right', color='red')
+        ax.plot(self.start[0], self.start[1], 'go', markersize=15)
+        ax.text(self.start[0], self.start[1], 'Start', fontsize=25, verticalalignment='bottom', horizontalalignment='right', color='green')
+        ax.plot(self.end[0], self.end[1], 'ro', markersize=15)
+        ax.text(self.end[0], self.end[1], 'End', fontsize=25, verticalalignment='bottom', horizontalalignment='right', color='red')
         ax.axis('square')
 
         return fig, ax
